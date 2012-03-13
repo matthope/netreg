@@ -136,6 +136,9 @@ sub get_add_level {
   $user = CMU::Netdb::valid('credentials.authid', $user, $user, 0, $dbh);
   return CMU::Netdb::getError($user) if (CMU::Netdb::getError($user) != 1);
 
+  my ($res, $override_auth) = CMU::Netdb::config::get_multi_conf_var('webint', 'OVERRIDE_AUTHENTICATION');
+  if ( defined $res && $override_auth == 1 ) { return 9; }
+
   # I believe this is wrong, add permissions have different semantics on
   # rows vs. tables.  I've looked at every piece of code that currently calls
   # get_add_level with $tid non-zero, and I believe they all expect the 'add access to row'
@@ -194,6 +197,9 @@ sub get_read_level {
   $user = CMU::Netdb::valid('credentials.authid', $user, $user, 0, $dbh);
   return CMU::Netdb::getError($user) if (CMU::Netdb::getError($user) != 1);
 
+  my ($res, $override_auth) = CMU::Netdb::config::get_multi_conf_var('webint', 'OVERRIDE_AUTHENTICATION');
+  if ( defined $res && $override_auth == 1 ) { return 9; }
+
   my $TidSelect = ($tid == 0 ? "P.tid = 0" : "(P.tid = '$tid' OR P.tid = 0)");
 
   $query = <<END_SELECT;
@@ -245,6 +251,9 @@ sub get_write_level {
 
   $user = CMU::Netdb::valid('credentials.authid', $user, $user, 0, $dbh);
   return CMU::Netdb::getError($user) if (CMU::Netdb::getError($user) != 1);
+
+  my ($res, $override_auth) = CMU::Netdb::config::get_multi_conf_var('webint', 'OVERRIDE_AUTHENTICATION');
+  if ( defined $res && $override_auth == 1 ) { return 9; }
 
   my $TidSelect = ($tid == 0 ? "P.tid = 0" : "(P.tid = '$tid' OR P.tid = 0)");
 
